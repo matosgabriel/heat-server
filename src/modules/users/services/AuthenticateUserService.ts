@@ -28,8 +28,7 @@ interface IUserData {
 }
 
 class AuthenticateUserService {
-
-  async execute({ code }: IAuthenticateUserDTO) {
+  async execute({ code, environment }: IAuthenticateUserDTO) {
     const url = `https://github.com/login/oauth/access_token`;
 
     let accessTokenResponse: IAcessTokenResponse;
@@ -37,8 +36,8 @@ class AuthenticateUserService {
     try {
       const { data } = await axios.post<IAcessTokenResponse>(url, null, {
         params: {
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
+          client_id: environment === 'web' ? process.env.GITHUB_CLIENT_ID_WEB : process.env.GITHUB_CLIENT_ID_MOBILE,
+          client_secret: environment === 'web' ? process.env.GITHUB_CLIENT_SECRET_WEB : process.env.GITHUB_CLIENT_SECRET_MOBILE,
           code,
         },
         headers: {

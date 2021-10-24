@@ -1,34 +1,35 @@
 import 'dotenv/config';
 import express, { NextFunction, Request, Response } from 'express';
-import 'express-async-errors';
-import { errors} from 'celebrate';
-import cors from 'cors';
-
 import http from 'http';
+import cors from 'cors';
 import { Server } from 'socket.io';
 
+import 'express-async-errors';
+import { errors} from 'celebrate';
 import { AppError } from '../../errors/AppError';
+
 import { appRoutes } from './routes/index';
 
-const client_id = process.env.GITHUB_CLIENT_ID;
+const client_id = process.env.GITHUB_CLIENT_ID_WEB;
 
 const app = express();
-app.use(express.json());
-app.use(errors());
-app.use(appRoutes);
 app.use(cors());
 
 const serverHttp = http.createServer(app);
 
 const io = new Server(serverHttp, {
   cors: {
-    origin: '*'
-  }
+    origin: '*',
+  },
 });
 
 io.on('connection', socket => {
   console.log(`Usuário conectado no socket ${socket.id}`);
-})
+});
+
+app.use(express.json());
+app.use(appRoutes);
+app.use(errors());
 
 // Error handle
 app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
